@@ -1,9 +1,12 @@
 {
   "dependencies": {
+    "@types/ws": "^8.5.13",
+    "dotenv": "^16.4.7",
     "typescript": "^5.7.2"
   },
   "scripts": {
     "build": "tsc --build",
-    "dev": "tsc --build && cd build && node main.js"
+    "dev": "tsc --build && cd build && node main.js",
+    "oauth-gen": "cd build/helpers && node Generate-OAuth.js"
   }
 }
