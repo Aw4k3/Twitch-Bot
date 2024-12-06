@@ -1,12 +1,10 @@
-import "dotenv/config";
-
 interface IParams {
   client_id: string;
   client_secret: string;
   grant_type: "client_credentials";
 }
 
-(async () => {
+export default async function generateOAuth() {
   const res = await fetch("https://id.twitch.tv/oauth2/token", {
     method: "POST",
     headers: {
@@ -21,4 +19,4 @@ interface IParams {
 
   const data = await res.json();
   console.log(data);
-})();
+};
