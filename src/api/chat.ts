@@ -1,12 +1,16 @@
+import { getOAuthToken } from "./database";
+
 const botUserId: string = "";
-export const oAuthToken: string = "jvq83bupxv4ed6gxo19c82mka9z88y";
+let oAuthToken: string = "";
 const clientId: string = "kzbcmztcozjdk6m6t0aybzr5mjqq85";
 const channels: string[] = ["Awake_Live"];
 export const eventSubWsUrl = "wss://eventsub.wss.twitch.tv/ws";
 
 let websocketSessionID: any = undefined;
 
-export function handleWebSocketMessage(data: any) {
+export async function handleWebSocketMessage(data: any) {
+  oAuthToken = await getOAuthToken();
+  
   switch (data.metadata.message_type) {
     case "session_welcome": // First message you get from the WebSocket server when connecting
       websocketSessionID = data.payload.session.id; // Register the Session ID it gives us
@@ -14,6 +18,7 @@ export function handleWebSocketMessage(data: any) {
       // Listen to EventSub, which joins the chatroom from your bot's account
       registerEventSubListeners();
       break;
+
     case "notification": // An EventSub notification has occurred, such as channel.chat.message
       switch (data.metadata.subscription_type) {
         case "channel.chat.message":

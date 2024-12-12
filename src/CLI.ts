@@ -1,7 +1,7 @@
 import readline from "node:readline";
 import generateOAuth from "./helpers/Generate-OAuth";
 
-export default function initCli(): void {
+export default function startCLI(): void {
   const stdin = readline.createInterface({
     input: process.stdin,
     output: process.stdout,

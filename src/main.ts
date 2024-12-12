@@ -1,27 +1,36 @@
 import "dotenv/config";
 import WebSocket from "ws";
-import initCli from "./CLI";
-import { oAuthToken, handleWebSocketMessage, eventSubWsUrl } from "./api/chat";
+import startCLI from "./CLI";
+import { handleWebSocketMessage, eventSubWsUrl } from "./api/chat";
+import { getOAuthToken, setOAuthToken, startDatabase } from "./api/database";
+import generateOAuth from "./helpers/Generate-OAuth";
+import { log, logDebug, logError } from "./helpers/Utilities";
 
 async function init(): Promise<void> {
   /* Get Auth */
-  const response = await fetch("https://id.twitch.tv/oauth2/validate", {
-    method: "GET",
-    headers: {
-      Authorization: "OAuth " + oAuthToken,
-    },
-  });
+  let authAttempts = 1;
 
-  if (response.status !== 200) {
-    let data = await response.json();
-    console.error(
-      `Token is not valid. /oauth2/validate returned status code ${response.status}`
-    );
-    console.error(data);
-    process.exit(1);
+  while (authAttempts > 0) {
+    authAttempts--;
+    const response = await fetch("https://id.twitch.tv/oauth2/validate", {
+      method: "GET",
+      headers: {
+        Authorization: "OAuth " + getOAuthToken(),
+      },
+    });
+  
+    if (response.status !== 200) {
+      let data = await response.json();
+      logError(
+        `Token is not valid. /oauth2/validate returned status code ${response.status}`
+      );
+      console.error(data);
+      setOAuthToken((await generateOAuth()).accessToken);
+    } else {
+      log("Validated token.");
+      break;
+    }
   }
-
-  console.log("Validated token.");
 
   /* Start Websocket */
   const websocketClient = new WebSocket(eventSubWsUrl);
@@ -29,7 +38,7 @@ async function init(): Promise<void> {
   websocketClient.on("error", console.error);
 
   websocketClient.on("open", () => {
-    console.log("WebSocket connection opened to " + eventSubWsUrl);
+    log("WebSocket connection opened to " + eventSubWsUrl);
   });
 
   websocketClient.on("message", (data) => {
@@ -37,9 +46,10 @@ async function init(): Promise<void> {
   });
 }
 
+startCLI();
+startDatabase();
+// init();
 
+logDebug(getOAuthToken());
 
-initCli();
-init();
-
-console.log("Ready");
+log("Bot ready");

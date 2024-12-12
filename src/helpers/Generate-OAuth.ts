@@ -4,7 +4,13 @@ interface IParams {
   grant_type: "client_credentials";
 }
 
-export default async function generateOAuth() {
+interface IOAuth {
+  accessToken: string;
+  expiresIn: number;
+  type: "bearer";
+}
+
+export default async function generateOAuth(): Promise<IOAuth> {
   const res = await fetch("https://id.twitch.tv/oauth2/token", {
     method: "POST",
     headers: {
@@ -18,5 +24,11 @@ export default async function generateOAuth() {
   });
 
   const data = await res.json();
-  console.log(data);
+  // console.log(data);
+
+  return { 
+    accessToken: data.access_token,
+    expiresIn: data.expires_in,
+    type: data.token_type
+  };
 };

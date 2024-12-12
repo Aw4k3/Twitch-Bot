@@ -1,8 +1,13 @@
 {
+  "name": "fakeawake-twitch-bot",
+  "version": "2.0.0",
+  "main": "main.js",
   "dependencies": {
     "@types/ws": "^8.5.13",
     "dotenv": "^16.4.7",
-    "typescript": "^5.7.2"
+    "sqlite3": "^5.1.7",
+    "typescript": "^5.7.2",
+    "ws": "^8.18.0"
   },
   "scripts": {
     "build": "powershell.exe scripts/build.ps1",
